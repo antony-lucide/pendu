@@ -3,14 +3,21 @@ from sys import exit
 import random
 import  sys
 
+
+
+#Cette fonction permet de lire le fichier des mots pré-enregistrer pour le pendu.
+#Ensuite je retourne une valeur aléatoire pour pouvoir choisir au hasard un mot dans mon pendu.
 def mot():
     f = open('mot.txt')
     résultat = f.read().splitlines() 
     f.close()
     return random.choice(résultat)
 
+#Je créer une variable avec la fonction mot à l'interieur afin de pouvoir la réutiliser dans une autres fonctions.
 total = mot()
 
+#Cette fonction permet de stocker les noms des string dans mon dossier txt.
+#Et les ajouters dans ma variable "Variable" pour l'appeller ailleurs.
 def string (phrase):
     variable = ''
     for name  in phrase:
@@ -20,9 +27,11 @@ def string (phrase):
             variable += " _ "
     return(variable)
 
-
+#Cette variable permet de stocker le nombre d'erreur faite par l'utilisateur.
 défaite = 0
 
+#Cette fonction a pour objectif de vérifier si la lettre choisis est la même dans le mot sélectionner.
+#Paramètre désigne la lettre, la section désigne les mots.
 def lettre (paramètre,section):
     global liste_de_lettre,défaite
     if paramètre in section.lower() and paramètre not in liste_de_lettre:
@@ -30,17 +39,25 @@ def lettre (paramètre,section):
     if paramètre not in section.lower() and paramètre not in liste_de_lettre:
         défaite += 1
     
-    
+#Une fonction pour vérifier si l'utilisateur a gagner la partie.
 def victorie():
     for i in total:
         if i.lower() not in liste_de_lettre:
             return False
     return(True)
 
+#Une fonction pour recharger la partie avec un autres mots aléatoire.
+def reload():
+        global liste_de_lettre,total,défaite
+        liste_de_lettre = []
+        total = mot()
+        défaite = 0
 
 
+#Une liste pour stocker les charactère rentré par l'utilisateur.
 liste_de_lettre = []
 
+#Interface.
 py.display.init()
 py.font.init()
 interface = py.display.set_mode((820,500))
@@ -51,26 +68,48 @@ interface_image = py.image.load('img/background.jpeg').convert()
 titre = text.render('Pendu',False,'Green')
 couleur_active = py.Color('dark blue')
 pendu = text.render(string(total),False,'red')
+loose = text.render('défaite',True,'red')
+win = text.render('victoire',True,'red')
+option = text.render('échape pour exit',True,False)
+#Liste contenant les images du pendu.
 liste_image = []
-
+#Variable pour la boucle infinie
 frame = True
-for i in range (6):
+
+#Une boucle pour vérifier les images et pouvoir les formater en fonction de leur position.
+for i in range (7):
     liste_image += [py.image.load(f'img/pendu_{i}.png')]
+#La boucle principale pour faire tourner l'interface pygame sans intérference.
+#La boucle vérifie d'abord si l'utilisateur ferme l'interface ou non.
+#La deuxième condition vérifie si la touche que l'utilisateur a entrée est "KEYDOWN".
+#KEYDOWN, c'est-a-dire n'importe quel touches appuyer.
+#Si KEYDOWN est actif alors, afficher la lettre utiliser et afficher la lettre à la place de "_".
+#La dernière condition permet de recharger la partie.
 while frame:   
     for event in py.event.get():
         if event.type == py.QUIT:
             frame = False
         if event.type == py.KEYDOWN:
             config = py.key.name(event.key)
-            print(config,lettre(config,total),liste_de_lettre)
+            lettre(config,total)
             pendu = text.render(string(total),False,'red')
-            if victorie():
-                print("victoire")
-            if défaite == 6:
-                print("défaite")
-            
+            if event.key == py.K_ESCAPE:
+                reload()
+    #Condition pour vérifier si la partie est gagner et afficher "Victoire".
+    #Même condition pour la défaite, sauf que on vérifie le nombre d'image afficher.
+    if victorie():
+        interface.blit(win,(580,300))
+        interface.blit(option,(530,400))
+    if défaite > 5:
+        interface.blit(loose,(620,400))
+        
+    #Permet d'actualiser l'interface.
     py.display.update()
     interface.blit(interface_image,(0,0))
-    interface.blit(liste_image[défaite],(0,0))
+    #Condition pour recharger la page
+    if défaite > 6:
+        reload()
+    #Arborescence de l'interface.
+    interface.blit(liste_image[défaite],(0,0))    
     interface.blit(pendu,(580,200))
-    interface.blit(titre,(620,100))
+    interface.blit(titre,(580,100))

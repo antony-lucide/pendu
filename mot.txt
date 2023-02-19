@@ -1,1 +1,15 @@
 Lettre
+mot
+Pompier
+Police
+SDF
+Joueur
+Voler     
+Boire
+Regarder
+Parler
+Surprise
+Camion
+Voiture
+Mordre
+Louer
