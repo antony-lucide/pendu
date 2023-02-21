@@ -138,5 +138,5 @@ while frame:
     #Condition pour recharger la page
     if défaite > 6:
         reload()
-    opti()
+    window()
     
