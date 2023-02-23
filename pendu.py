@@ -55,7 +55,8 @@ def reload():
 
 def Menu():
     global total
-    total = input()
+    if len(champs) > 0:
+        total = champs
     print(total)
 
 
@@ -74,7 +75,6 @@ def opti():
 
 #Une liste pour stocker les charactère rentré par l'utilisateur.
 liste_de_lettre = []
-
 
 #Arborescence de l'interface.
 py.display.init()
@@ -95,12 +95,14 @@ menu = py.transform.smoothscale(menu,(200,200))
 couleur_noir = (200,200,200)
 boutton = text.render('Play',False,'red')
 entrybox = text.render('Entrybox',False,'red')
+champs = ''
+text_surface = text.render(champs,False,'red')
 #Liste contenant les images du pendu.
 liste_image = []
 #Variable pour la boucle infinie
 frame = True
-
-
+nordine = True
+focus_entrybox = False
 Menu()
 #Une boucle pour vérifier les images et pouvoir les formater en fonction de leur position.
 for i in range (7):
@@ -115,28 +117,54 @@ for i in range (7):
 #La dernière condition permet de recharger la partie.
 while frame:
     for event in py.event.get():
+        souris = py.mouse.get_pos()
         if event.type == py.QUIT:
-            frame = False
-        if event.type == py.KEYDOWN:
-            config = py.key.name(event.key)
-            lettre(config,total)
-            pendu = text.render(string(total),False,'red')
-            if event.key == py.K_ESCAPE:
-                reload()
-            if event.key == py.MOUSEBUTTONDOWN:
-                window()               
-    #Condition pour vérifier si la partie est gagner et afficher "Victoire".
-    #Même condition pour la défaite, sauf que on vérifie le nombre d'images afficher.
-    if victorie():
-        interface.blit(win,(580,300))
-        interface.blit(option,(160,400))
-    if défaite > 5:
-        interface.blit(loose,(620,400))
-    #Permet d'actualiser l'interface.
-    py.display.update()
-    interface.blit(interface_image,(0,0))
-    #Condition pour recharger la page
-    if défaite > 6:
-        reload()
-    window()
+                frame = False
+        if nordine:
+            if event.type == py.MOUSEBUTTONDOWN:
+                if py.mouse.get_pressed()[0] and 350 <= souris[0] <= 430 and 230 <= souris[1] <= 270:
+                    nordine = False
+                    focus_entrybox = False
+                    Menu()
+                if py.mouse.get_pressed()[0] and 350 <= souris[0] <= 430 and 330 <= souris[1] <= 370:
+                    focus_entrybox = True
+            if focus_entrybox and event.type == py.KEYDOWN:
+                if py.key.name(event.key) in "abcdefghijklmnopqrstuvwxyz":
+                    champs += py.key.name(event.key)
+                else:
+                    if event.key == py.K_RETURN:
+                        focus_entrybox = False
+                    elif event.key == py.K_BACKSPACE:
+                        champs = champs[:-1]
+                print(champs)
+                interface.blit(text_surface,(50,130))
+        else:
+            if event.type == py.KEYDOWN:
+                if not victorie():
+                    config = py.key.name(event.key)
+                    lettre(config,total)
+                pendu = text.render(string(total),False,'red')
+                if event.key == py.K_ESCAPE:
+                    reload()
+
+    if nordine:
+        # Permet d'actualiser l'interface.
+        py.display.update()
+        interface.blit(interface_image, (0, 0))
+        opti()
+    else:
+        #Condition pour vérifier si la partie est gagner et afficher "Victoire".
+        #Même condition pour la défaite, sauf que on vérifie le nombre d'images afficher.
+        if victorie():
+            interface.blit(win,(580,300))
+            interface.blit(option,(160,400))
+        if défaite > 5:
+            interface.blit(loose,(620,400))
+        # Permet d'actualiser l'interface.
+        py.display.update()
+        interface.blit(interface_image, (0, 0))
+        #Condition pour recharger la page
+        if défaite > 6:
+            reload() 
+        window()
     
