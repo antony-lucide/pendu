@@ -7,14 +7,14 @@ import  sys
 
 #Cette fonction permet de lire le fichier des mots pré-enregistrer pour le pendu.
 #Ensuite je retourne une valeur aléatoire pour pouvoir choisir au hasard un mot dans mon pendu.
-def mot():
-    f = open('mot.txt')
+def mot(difficulte):
+    f = open("mot" + str(difficulte) + ".txt")
     résultat = f.read().splitlines() 
     f.close()
     return random.choice(résultat)
 
 #Je créer une variable avec la fonction mot à l'interieur afin de pouvoir la réutiliser dans une autres fonctions.
-total = mot()
+total = mot(1)
 
 #Cette fonction permet de stocker les noms des string dans mon dossier txt.
 #Et les ajouters dans ma variable "Variable" pour l'appeller ailleurs.
@@ -50,28 +50,37 @@ def victorie():
 def reload():
         global liste_de_lettre,total,défaite
         liste_de_lettre = []
-        total = mot()
+        total = mot(difficulte)
         défaite = 0
 
+#Cette fonction vérifie si, ils y a quelque choses à l'interieur de champs
 def Menu():
     global total
     if len(champs) > 0:
         total = champs
     print(total)
 
-
+#Fonction pour afficher le pendu
 def window():
     image = interface.blit(liste_image[défaite],(0,0))    
     interface.blit(pendu,(580,200))
     interface.blit(titre,(580,100))
    
-
+#Fonction pour afficher le menu
 def opti():
+    text_surface = text.render(champs,True,'red')
+    entrybox_facile = text.render('Facile',True,'red')
+    entrybox_normal = text.render('Normal',True,'red')
+    entrybox_difficile = text.render('Difficile',True,'red')
     interface.blit(menu,(300,200))
     py.draw.rect(menu,couleur_noir,[50, 30, 80 , 40], 0)
     menu.blit(boutton,(50,30))
-    py.draw.rect(menu,couleur_noir,[50, 130, 80 , 40], 0)
+    py.draw.rect(menu,couleur_noir,[50, 130, 90 , 40], 0)
     menu.blit(entrybox,(30,90))
+    menu.blit(text_surface,(50,130))
+    interface.blit(entrybox_facile,(180,400))
+    interface.blit(entrybox_normal,(300,400))
+    interface.blit(entrybox_difficile,(460,400))
 
 #Une liste pour stocker les charactère rentré par l'utilisateur.
 liste_de_lettre = []
@@ -95,14 +104,17 @@ menu = py.transform.smoothscale(menu,(200,200))
 couleur_noir = (200,200,200)
 boutton = text.render('Play',False,'red')
 entrybox = text.render('Entrybox',False,'red')
-champs = ''
-text_surface = text.render(champs,False,'red')
+champs = '' 
 #Liste contenant les images du pendu.
 liste_image = []
 #Variable pour la boucle infinie
 frame = True
-nordine = True
+activate = True
 focus_entrybox = False
+FACILE = 0
+NORMAL = 1
+DIFFICILE = 2
+difficulte = NORMAL
 Menu()
 #Une boucle pour vérifier les images et pouvoir les formater en fonction de leur position.
 for i in range (7):
@@ -120,14 +132,26 @@ while frame:
         souris = py.mouse.get_pos()
         if event.type == py.QUIT:
                 frame = False
-        if nordine:
+        if activate:
             if event.type == py.MOUSEBUTTONDOWN:
+                print(souris)
                 if py.mouse.get_pressed()[0] and 350 <= souris[0] <= 430 and 230 <= souris[1] <= 270:
-                    nordine = False
+                    activate = False
                     focus_entrybox = False
+                    print(difficulte)
+                    total = mot(difficulte)
                     Menu()
                 if py.mouse.get_pressed()[0] and 350 <= souris[0] <= 430 and 330 <= souris[1] <= 370:
                     focus_entrybox = True
+                if py.mouse.get_pressed()[0] and 180 <= souris[0] <= 280 and 400 <= souris[1] <= 430:
+                    print("FACILE")
+                    difficulte = FACILE
+                if py.mouse.get_pressed()[0] and 300 <= souris[0] <= 424 and 400 <= souris[1] <= 430:
+                    print("NORM")
+                    difficulte = NORMAL
+                if py.mouse.get_pressed()[0] and 460 <= souris[0] <= 590 and 400 <= souris[1] <= 430:
+                    print("DIFFICILE")
+                    difficulte = DIFFICILE
             if focus_entrybox and event.type == py.KEYDOWN:
                 if py.key.name(event.key) in "abcdefghijklmnopqrstuvwxyz":
                     champs += py.key.name(event.key)
@@ -137,7 +161,6 @@ while frame:
                     elif event.key == py.K_BACKSPACE:
                         champs = champs[:-1]
                 print(champs)
-                interface.blit(text_surface,(50,130))
         else:
             if event.type == py.KEYDOWN:
                 if not victorie():
@@ -146,8 +169,7 @@ while frame:
                 pendu = text.render(string(total),False,'red')
                 if event.key == py.K_ESCAPE:
                     reload()
-
-    if nordine:
+    if activate:
         # Permet d'actualiser l'interface.
         py.display.update()
         interface.blit(interface_image, (0, 0))
@@ -167,4 +189,3 @@ while frame:
         if défaite > 6:
             reload() 
         window()
-    
