@@ -58,7 +58,6 @@ def Menu():
     global total
     if len(champs) > 0:
         total = champs
-    print(total)
 
 #Fonction pour afficher le pendu
 def window():
@@ -109,12 +108,17 @@ champs = ''
 liste_image = []
 #Variable pour la boucle infinie
 frame = True
+#Permet d'afficher le menu grâce a ma valeur bool
 activate = True
+#Variable pour le focus de mon entrybox
 focus_entrybox = False
+#Permet de switcher entre diffculter une fois avoir appuyer sur le boutton
 FACILE = 0
 NORMAL = 1
 DIFFICILE = 2
+#Difficulté de base
 difficulte = NORMAL
+#On appellent cette diffculté en dehors afin de pouvoir l'appeler dans d'autre fonction/conditions
 Menu()
 #Une boucle pour vérifier les images et pouvoir les formater en fonction de leur position.
 for i in range (7):
@@ -123,9 +127,11 @@ for i in range (7):
 
 #La boucle principale pour faire tourner l'interface pygame sans intérference.
 #La boucle vérifie d'abord si l'utilisateur ferme l'interface ou non.
-#La deuxième condition vérifie si la touche que l'utilisateur a entrée est "KEYDOWN".
 #KEYDOWN, c'est-a-dire n'importe quel touches appuyer.
 #Si KEYDOWN est actif alors, afficher la lettre utiliser et afficher la lettre à la place de "_".
+#Les cinque conditions permettent de vérifier la difficulté des mots dans la liste et pouvoir choisir celle-ci.
+#la condition de fous_entrybox permet de vérifier les lettres rentrée dans celle-ci et pouvoir l'afficher dans le pendu.
+#L'avant dernière condition vérifie si la touche que l'utilisateur a entrée est "KEYDOWN".
 #La dernière condition permet de recharger la partie.
 while frame:
     for event in py.event.get():
@@ -133,8 +139,7 @@ while frame:
         if event.type == py.QUIT:
                 frame = False
         if activate:
-            if event.type == py.MOUSEBUTTONDOWN:
-                print(souris)
+            if event.type == py.MOUSEBUTTONDOWN: 
                 if py.mouse.get_pressed()[0] and 350 <= souris[0] <= 430 and 230 <= souris[1] <= 270:
                     activate = False
                     focus_entrybox = False
@@ -182,6 +187,7 @@ while frame:
             interface.blit(option,(160,400))
         if défaite > 5:
             interface.blit(loose,(620,400))
+            interface.blit(option,(160,400))
         # Permet d'actualiser l'interface.
         py.display.update()
         interface.blit(interface_image, (0, 0))
